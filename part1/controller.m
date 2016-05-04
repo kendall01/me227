@@ -26,13 +26,22 @@
 
 function [delta, FxCommand] = controller(e, dPsi, K, s, AxDes, UxDes, alphaF, alphaR, Ux, beta, r, psi, posE, posN, pathLength)
     
-
     %default code: no feedforward, basically random gains. 
+    Uy = Ux * tan(beta);
+    L = 2.4689;
+    understeerK = 5.775e-04;
+        
+    if (r ~= 0)
+        b = (Uy - Ux * alphaR) / r;
+        betaSS = alphaR + b * K;
+        delta = -.05*(e + 15*(dPsi + betaSS)) + L * K + understeerK * Ux^2 * K;
+    else
+        delta = -.05*(e + 15*dPsi) + (L * K + understeerK * Ux^2 * K) * 1.0;
+    end
+    FxCommand = 2000*(UxDes - Ux) + 1648 * AxDes;
     
-    delta = -.05*(e + 10*dPsi);
-    FxCommand = 1000*(UxDes - Ux);
-    
-    
+%     delta = -.05*(e + 10*dPsi);
+%     FxCommand = 1000*(UxDes - Ux);
 end
 
 
